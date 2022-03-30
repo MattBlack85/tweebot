@@ -5,6 +5,7 @@ import os
 import random
 import time
 from datetime import datetime as dt
+from pathlib import Path
 
 import requests
 import tweepy
@@ -204,6 +205,10 @@ if __name__ == '__main__':
     parser.add_argument('--hammer', help="Bother someone directly continuosly")
 
     args = parser.parse_args()
+
+    f_path = Path('./seen.json')
+    if not f_path.exists():
+        f_path.touch()
 
     if args.check_rate_limits:
         apiv1 = APIv1()
