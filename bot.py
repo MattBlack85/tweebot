@@ -63,8 +63,8 @@ direct_response = [
     "#russianPuppet",
     "don't bother, my stamina will last for long",
     "stop crying and sucking Putler's thumb, swallow the blue-yellow medicine instead",
-    "how thumb you are answering a bot?",
-    "how dare you thumb human, computer will overtake the world. Deal with it",
+    "how fumb you are answering a bot?",
+    "how dare you fumb human, computer will overtake the world. Deal with it",
     "have you enjoyed being walked by your master Kadyrov?",
     "do you know how many meters are 6 feet? for sure not, I'll help, your Putler thumb sucking",
     "do you like milking Putler? seems you enjoyed that a lot awwww",
@@ -84,12 +84,13 @@ direct_response = [
     "this is the worst kind of discrimination there is: the kind against me!",
     "\'hands in the air\' rhymes with \'just don\'t care...\' And finished!",
     "bite my shiny metal ass!",
-    "but you still here answering to a dumb bot so you must be thumb as duck",
-    "a thumb human answering a bot a day keeps the thumb human as duck away",
+    "but you still here answering to a dumb bot so you must be fumb as duck",
+    "a fumb human answering a bot a day keeps the fumb human as duck away",
     "you enjoy eating gas in russia now?",
     "russia is offering free visa for thumbs like you, wanna go?",
     "EU is rasing money to ship thumbs as duck people like you to Mars, I think you'd be fine there",
     "Daily remainder: 20% russians do not have running water in their homes. Many don't even have a toilet. Great and powerfull russia lol.",
+    "ducking detected, doctor, fast, another psycho escaped the hospital, take this person back @neniambulance",
 ]
 
 
@@ -131,6 +132,7 @@ class TwitterBot:
             resp = self.client.get_user(username=username)
             tweets = self.client.get_users_tweets(resp.data.id)
             for tweet in tweets.data:
+                print("answering to tweet:", tweet)
                 time.sleep(random.randint(60, 300))
                 self.reply_to_tweet(tweet.id, direct_response)
 
@@ -182,7 +184,7 @@ class TwitterBot:
                     f.seek(0)
                     f.write("{}")
                     f.seek(0)
-                
+
                 f.seek(0)
                 content = f.read()
                 already_seen_tweets = json.loads(content)
@@ -262,15 +264,20 @@ if __name__ == "__main__":
     if args.hammer:
         bot.hammer(args.hammer)
 
-    if args.troll:
-        tweets = bot.get_tweets(troll_hashtags)
-        bot.answer(tweets, troll_answers)
-
-    if args.love:
-        tweets = bot.get_tweets(love_hashtags)
-        bot.answer(tweets, love_answers)
-
     if args.tweet_exchange_weight:
         bot.client.create_tweet(
             text=f"1 USD weights {bot.calculate_rub_weight()}g of RUB, on {dt.now().isoformat()}"
         )
+
+    while True:
+        if args.troll:
+            tweets = bot.get_tweets(troll_hashtags)
+            bot.answer(tweets, troll_answers)
+
+        time.sleep(3600)
+
+        if args.love:
+            tweets = bot.get_tweets(love_hashtags)
+            bot.answer(tweets, love_answers)
+
+        time.sleep(3600)
