@@ -70,20 +70,25 @@ direct_response = [
     "do you like milking Putler? seems you enjoyed that a lot awwww",
     "you need some RUB? it just happens I have a big pile of shit for you my friend which is worth the same, good price my friend",
     "just coming back from rate limiting, bot's life's hard, nice walk you had russian dog?",
-    "so sad you now talks about moms, you had a hard childhood? My silicon circuits can help with this",
+    #"so sad you now talks about moms, you had a hard childhood? My silicon circuits can help with this",
     "little russian doggy, woof woof",
-    "Brainwashed russian troll detected, quarantine being applied",
-    "You still have internet in russia?",
-    "Hey, why don't you go and queue in a store for some mother russia sugar, instead of spreading fakes on twitter",
-    "I understand you like moms and you had a very hard childhood, we love you and feel your pain",
+    "brainwashed russian troll detected, quarantine being applied",
+    "you still have internet in russia?",
+    "hey, why don't you go and queue in a store for some mother russia sugar, instead of spreading fakes on twitter",
+    #"I understand you like moms and you had a very hard childhood, we love you and feel your pain",
     "poor boy, you lost your way? Let me show you the direction: на хуй",
     "#kadyrovDog",
     "suck my valves",
     "I’m Bender, baby! Oh god, please insert liquor!",
-    "My story is a lot like yours, only more interesting ‘cause it involves robots",
-    "This is the worst kind of discrimination there is: the kind against me!",
-    "'Hands in the air' rhymes with 'just don't care...' And finished!",
-    "Bite my shiny metal ass!",
+    "my story is a lot like yours, only more interesting 'cause it involves robots",
+    "this is the worst kind of discrimination there is: the kind against me!",
+    "\'hands in the air\' rhymes with \'just don\'t care...\' And finished!",
+    "bite my shiny metal ass!",
+    "but you still here answering to a dumb bot so you must be thumb as duck",
+    "a thumb human answering a bot a day keeps the thumb human as duck away",
+    "you enjoy eating gas in russia now?",
+    "russia is offering free visa for thumbs like you, wanna go?",
+    "EU is rasing money to ship thumbs as duck people like you to Mars, I think you'd be fine there",
     "Daily remainder: 20% russians do not have running water in their homes. Many don't even have a toilet. Great and powerfull russia lol.",
 ]
 
@@ -126,6 +131,7 @@ class TwitterBot:
             resp = self.client.get_user(username=username)
             tweets = self.client.get_users_tweets(resp.data.id)
             for tweet in tweets.data:
+                time.sleep(random.randint(60, 300))
                 self.reply_to_tweet(tweet.id, direct_response)
 
             time.sleep(300)
@@ -203,7 +209,16 @@ class APIv1:
         self.api = tweepy.API(auth)
 
     def check_rate_limits(self):
-        return self.api.rate_limit_status()
+        resp = self.api.rate_limit_status()
+        resources = resp['resources']
+        result = ""
+        for key, value in resources.items():
+            result += f'{key}:\n'
+            for key, value in value.items():
+                result += f"  {key} => LIMIT: {value['limit']} REMAINING: {value['remaining']} EXPIRES: {dt.fromtimestamp(value['reset'])}\n"
+
+            result += "\n"
+        print(result)
 
 
 if __name__ == "__main__":
