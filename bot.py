@@ -28,7 +28,7 @@ love_answers = [
     "#IStandWithUkraine",
     "#FuckPutin ❤️ 🇺🇦 ",
     "Слава Україні",
-    "Слава Україні, Героям Слава"
+    "Слава Україні, Героям Слава",
 ]
 
 troll_answers = [
@@ -48,7 +48,7 @@ troll_answers = [
     "слава Україні",
     "Російський воєнний корабель, йди нахуй",
     "#jebaćPutina",
-    "#kadyrovDog"
+    "#kadyrovDog",
 ]
 
 direct_response = [
@@ -82,8 +82,9 @@ direct_response = [
     "I’m Bender, baby! Oh god, please insert liquor!",
     "My story is a lot like yours, only more interesting ‘cause it involves robots",
     "This is the worst kind of discrimination there is: the kind against me!",
-    "\'Hands in the air\' rhymes with \'just don\'t care...\' And finished!",
+    "'Hands in the air' rhymes with 'just don't care...' And finished!",
     "Bite my shiny metal ass!",
+    "Daily remainder: 20% russians do not have running water in their homes. Many don't even have a toilet. Great and powerfull russia lol.",
 ]
 
 
@@ -108,8 +109,12 @@ class TwitterBot:
         )
 
     def follow_user(self):
-        tweets = self.get_tweets(love_hashtags, max_results=50,
-                                 expansions="author_id", start_time=dt.utcnow() - datetime.timedelta(days=2))
+        tweets = self.get_tweets(
+            love_hashtags,
+            max_results=50,
+            expansions="author_id",
+            start_time=dt.utcnow() - datetime.timedelta(days=2),
+        )
         for tweet in tweets.data:
             try:
                 self.client.follow_user(tweet.author_id)
@@ -145,7 +150,7 @@ class TwitterBot:
 
     def _check_exchange(self):
         response = requests.get(self.exchange_url)
-        return float(response.json()['rates']['RUB'])
+        return float(response.json()["rates"]["RUB"])
 
     def calculate_rub_weight(self):
         coins = self._check_exchange() / 10
@@ -163,7 +168,18 @@ class TwitterBot:
     def answer(self, tweets, answers):
         if tweets.data:
             with open("seen.json", "r+") as f:
-                already_seen_tweets = json.loads(f.read())
+                try:
+                    already_seen_tweets = json.loads(f.read())
+                except json.decoder.JSONDecodeError as e:
+                    print(e)
+                    f.truncate(0)
+                    f.seek(0)
+                    f.write("{}")
+                    f.seek(0)
+                
+                f.seek(0)
+                content = f.read()
+                already_seen_tweets = json.loads(content)
                 f.seek(0)
 
                 for tweet in tweets.data:
@@ -176,7 +192,6 @@ class TwitterBot:
 
 
 class APIv1:
-
     def __init__(self):
         auth = tweepy.OAuth1UserHandler(
             CONSUMER_KEY,
@@ -191,22 +206,32 @@ class APIv1:
         return self.api.rate_limit_status()
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--troll', help='Start trolling', action=argparse.BooleanOptionalAction)
-    parser.add_argument('--love', help='Start trolling', action=argparse.BooleanOptionalAction)
-    parser.add_argument('--tweet-exchange-weight',
-                        help='Tweet how many grams of rubles is worth 1$',
-                        action=argparse.BooleanOptionalAction)
-    parser.add_argument('--check-rate-limits', help="Return actual limits",
-                        action=argparse.BooleanOptionalAction)
-    parser.add_argument('--follow', help="Follow some accounts",
-                        action=argparse.BooleanOptionalAction)
-    parser.add_argument('--hammer', help="Bother someone directly continuosly")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser.add_argument(
+        "--troll", help="Start trolling", action=argparse.BooleanOptionalAction
+    )
+    parser.add_argument(
+        "--love", help="Start trolling", action=argparse.BooleanOptionalAction
+    )
+    parser.add_argument(
+        "--tweet-exchange-weight",
+        help="Tweet how many grams of rubles is worth 1$",
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "--check-rate-limits",
+        help="Return actual limits",
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "--follow", help="Follow some accounts", action=argparse.BooleanOptionalAction
+    )
+    parser.add_argument("--hammer", help="Bother someone directly continuosly")
 
     args = parser.parse_args()
 
-    f_path = Path('./seen.json')
+    f_path = Path("./seen.json")
     if not f_path.exists():
         f_path.touch()
 
